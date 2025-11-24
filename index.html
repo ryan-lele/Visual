@@ -1,0 +1,542 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Sparkles, Zap, ArrowRight, CheckCircle, Video, ShieldCheck, Users, Award, MapPin, Play, Globe, Layout, FileText, Cpu } from 'lucide-react';
+
+/**
+ * Visual Alchemy (视觉炼金) 官网 - V2.2 Service Expansion
+ * * 变更日志：
+ * 1. 新增 "Digital Expansion" 板块：包含 网站搭建、品牌UI设计、实用型专利开发。
+ * 2. 优化了部分文案，强调“全链路商业价值”。
+ */
+
+// --- Before/After Slider Component ---
+const ComparisonSlider = ({ beforeLabel, afterLabel, beforeImage, afterImage, alt }) => {
+  const [sliderPosition, setSliderPosition] = useState(50);
+  const [isResizing, setIsResizing] = useState(false);
+  const containerRef = useRef(null);
+
+  const handleMouseDown = () => setIsResizing(true);
+  const handleMouseUp = () => setIsResizing(false);
+  
+  const handleMouseMove = (e) => {
+    if (!isResizing || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    setSliderPosition((x / rect.width) * 100);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(e.touches[0].clientX - rect.left, rect.width));
+    setSliderPosition((x / rect.width) * 100);
+  };
+
+  useEffect(() => {
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchend', handleMouseUp);
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchend', handleMouseUp);
+    }
+  }, []);
+
+  return (
+    <div 
+      ref={containerRef}
+      className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden cursor-ew-resize select-none group shadow-2xl border border-[#333] touch-none"
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
+    >
+      {/* After Image (Background) */}
+      <img 
+        src={afterImage} 
+        alt={alt} 
+        className="absolute top-0 left-0 w-full h-full object-cover" 
+        onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/800x600/1a1a1a/FF9900?text=Image+Missing:+'+afterImage}}
+      />
+      <div className="absolute top-4 right-4 bg-[#FF9900] text-black text-xs font-bold px-3 py-1 rounded-sm uppercase tracking-wider z-10 shadow-lg">
+        {afterLabel}
+      </div>
+
+      {/* Before Image (Clipped) */}
+      <div 
+        className="absolute top-0 left-0 h-full overflow-hidden border-r-2 border-[#FF9900]"
+        style={{ width: `${sliderPosition}%` }}
+      >
+        <img 
+          src={beforeImage} 
+          alt={alt} 
+          className="absolute top-0 left-0 max-w-none h-full object-cover" 
+          style={{ width: containerRef.current ? containerRef.current.offsetWidth : '100%' }} 
+          onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/800x600/333333/666666?text=Image+Missing:+'+beforeImage}}
+        />
+        <div className="absolute top-4 left-4 bg-black/80 text-gray-300 text-xs font-bold px-3 py-1 rounded-sm uppercase tracking-wider shadow-lg backdrop-blur-sm border border-gray-700">
+          {beforeLabel}
+        </div>
+      </div>
+
+      {/* Slider Handle */}
+      <div 
+        className="absolute top-0 bottom-0 w-1 bg-transparent cursor-ew-resize flex items-center justify-center"
+        style={{ left: `${sliderPosition}%` }}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleMouseDown}
+      >
+        <div className="w-8 h-8 bg-[#FF9900] rounded-full shadow-[0_0_15px_rgba(255,153,0,0.6)] flex items-center justify-center -ml-1 transform transition-transform group-hover:scale-110 border-2 border-white">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Main App Component ---
+export default function VisualAlchemy() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#1A1A1A] text-gray-200 font-sans selection:bg-[#FF9900] selection:text-black pb-20">
+      
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#1A1A1A]/95 backdrop-blur-md py-3 shadow-lg border-b border-[#333]' : 'bg-transparent py-6'}`}>
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-[#FF9900] flex items-center justify-center rounded-sm">
+              <Sparkles className="w-5 h-5 text-black" />
+            </div>
+            <span className="text-xl font-bold tracking-tight text-white uppercase font-mono">Visual <span className="text-[#FF9900]">Alchemy</span></span>
+          </div>
+          <button className="bg-white hover:bg-gray-200 text-black px-4 md:px-6 py-2 rounded-sm text-xs md:text-sm font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(255,255,255,0.2)]">
+            免费视觉诊断
+          </button>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <header className="relative h-screen flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/hero_bg_cinematic.jpg" 
+            alt="Visual Alchemy Cinematic Background" 
+            className="w-full h-full object-cover opacity-40"
+            onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/1920x1080/0a0a0a/333333?text=Missing:/images/hero_bg_cinematic.jpg'}}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A1A]/80 via-[#1A1A1A]/50 to-[#1A1A1A] z-10"></div>
+        </div>
+
+        <div className="container mx-auto px-6 text-center relative z-20 pt-20">
+          <div className="inline-flex items-center gap-2 px-3 py-1 border border-[#FF9900]/50 text-[#FF9900] text-xs font-bold uppercase tracking-[0.2em] mb-8 bg-black/50 backdrop-blur-sm">
+            <MapPin className="w-3 h-3" /> Hangzhou · B2B Industrial Design
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black text-white leading-none mb-8 tracking-tight">
+            并不是所有机器，<br />
+            都能展现出<span className="text-[#FF9900]">“德国品质”</span>。
+          </h1>
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-light">
+            我们不生产机器。我们用<span className="text-white font-medium">豪宅设计的审美</span>，重构工业产品的价值。<br/>
+            <span className="text-[#00CCFF] italic">Visual Translators of Industrial Value.</span>
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center px-4">
+            <button className="bg-[#FF9900] text-black px-8 py-4 rounded-sm font-bold text-lg hover:bg-[#e68a00] transition-colors flex items-center justify-center gap-2 shadow-[0_0_30px_rgba(255,153,0,0.3)]">
+              查看重构案例 <ArrowRight className="w-5 h-5" />
+            </button>
+            <button className="bg-transparent border border-gray-600 text-white px-8 py-4 rounded-sm font-bold text-lg hover:border-white hover:bg-white/5 transition-colors flex items-center gap-2">
+              <Play className="w-4 h-4" /> 观看品牌影片
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Trust Indicators */}
+      <div className="border-y border-[#333] bg-[#111]">
+        <div className="container mx-auto px-6 py-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="flex flex-col items-center gap-2">
+              <Award className="w-6 h-6 text-[#00CCFF]" />
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">室内设计背景</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Users className="w-6 h-6 text-[#00CCFF]" />
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">专家级团队</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <Zap className="w-6 h-6 text-[#00CCFF]" />
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">AI 逻辑重构</span>
+            </div>
+            <div className="flex flex-col items-center gap-2">
+              <ShieldCheck className="w-6 h-6 text-[#00CCFF]" />
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">成交确定性</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Industrial Portfolio Section (Case Studies) */}
+      <section className="py-24 relative bg-[#1A1A1A]" id="portfolio">
+        <div className="container mx-auto px-6">
+          <div className="mb-16 border-l-4 border-[#FF9900] pl-6">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-2 uppercase">Reconstruction <span className="text-[#FF9900]">///</span> 工业重构</h2>
+            <p className="text-gray-400">拖动滑块，见证从“废品站”到“德系精工”的质变。</p>
+          </div>
+
+          <div className="space-y-32">
+            {/* Case 1: Generic Laser Welder */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <ComparisonSlider 
+                  beforeLabel="Before: 露天作坊实拍"
+                  afterLabel="After: 德系黑武士风格"
+                  beforeImage="/images/case01_laser_before.jpg"
+                  afterImage="/images/case01_laser_after.jpg"
+                  alt="Industrial Handheld Welder Transformation"
+                />
+              </div>
+              <div>
+                <div className="inline-flex items-center gap-2 text-[#FF9900] font-mono text-sm mb-4">
+                   <span className="w-2 h-2 bg-[#FF9900]"></span> CASE STUDY 01
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-4">精密激光设备 · 视觉升级</h3>
+                <p className="text-gray-400 mb-6 leading-relaxed font-light">
+                  <strong className="text-white block mb-2 font-bold">痛点：</strong> 
+                  原图拍摄于杂乱的水泥地，电线缠绕，严重拉低了万元级设备的价值感，难以获得海外客户信任。
+                  <br/><br/>
+                  <strong className="text-white block mb-2 font-bold">炼金方案 (Dark Knight Style)：</strong> 
+                  彻底重构为<span className="text-[#00CCFF]">“深灰色极简影棚”</span>。利用戏剧性侧光勾勒金属拉丝质感，外壳做半透明处理，透视内部精密铜管结构。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                   <div className="px-3 py-1 border border-gray-700 rounded-sm text-xs text-gray-300">德系质感</div>
+                   <div className="px-3 py-1 border border-gray-700 rounded-sm text-xs text-gray-300">内部透视</div>
+                   <div className="px-3 py-1 border border-[#00CCFF]/30 text-[#00CCFF] rounded-sm text-xs">+ 品牌溢价</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Case 2: Generic Medical Line */}
+            <div className="grid md:grid-cols-2 gap-12 items-center md:flex-row-reverse">
+              <div className="md:order-2">
+                <ComparisonSlider 
+                  beforeLabel="Before: 老旧厂房背景"
+                  afterLabel="After: GMP 无菌实验室"
+                  beforeImage="/images/case02_medical_before.jpg"
+                  afterImage="/images/case02_medical_after.jpg"
+                  alt="Medical Production Line Transformation"
+                />
+              </div>
+              <div className="md:order-1">
+                <div className="inline-flex items-center gap-2 text-[#00CCFF] font-mono text-sm mb-4">
+                   <span className="w-2 h-2 bg-[#00CCFF]"></span> CASE STUDY 02
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-4">医疗耗材产线 · 信任重塑</h3>
+                <p className="text-gray-400 mb-6 leading-relaxed font-light">
+                  <strong className="text-white block mb-2 font-bold">痛点：</strong> 
+                  背景陈旧，给人落后的作坊印象，严重缺乏医疗行业必须的“卫生感”和“科技感”。
+                  <br/><br/>
+                  <strong className="text-white block mb-2 font-bold">炼金方案 (Sterile Lab Style)：</strong> 
+                  置换为极致纯白的<span className="text-[#00CCFF]">“GMP 无菌级车间”</span>环境。使用冷蓝科技光，微观展示产品的晶莹剔透，建立绝对的卫生信任。
+                </p>
+                <div className="flex flex-wrap gap-3">
+                   <div className="px-3 py-1 border border-gray-700 rounded-sm text-xs text-gray-300">医疗级洁净</div>
+                   <div className="px-3 py-1 border border-gray-700 rounded-sm text-xs text-gray-300">微观特写</div>
+                   <div className="px-3 py-1 border border-[#00CCFF]/30 text-[#00CCFF] rounded-sm text-xs">+ 信任背书</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* NEW SECTION: Digital Asset Extension */}
+      <section className="py-24 bg-[#141414] border-t border-[#333]">
+        <div className="container mx-auto px-6">
+          <div className="mb-16 border-l-4 border-[#00CCFF] pl-6">
+             <h2 className="text-3xl md:text-4xl font-black text-white mb-2 uppercase">Digital Expansion <span className="text-[#00CCFF]">///</span> 数字资产延伸</h2>
+             <p className="text-gray-400">从一张图，到全链路的品牌竞争力。</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Card 1: Website */}
+            <div className="group bg-[#1A1A1A] border border-[#333] hover:border-[#FF9900] transition-colors rounded-sm overflow-hidden flex flex-col">
+               <div className="h-48 overflow-hidden relative">
+                 <img 
+                   src="/images/service_web_global.jpg" 
+                   alt="Global Website Development" 
+                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                   onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/600x400/111/444?text=Service:+Website+Development'}}
+                 />
+                 <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm p-2 rounded-sm border border-gray-700">
+                    <Globe className="w-5 h-5 text-[#FF9900]" />
+                 </div>
+               </div>
+               <div className="p-8 flex-1 flex flex-col">
+                  <h3 className="text-xl font-bold text-white mb-3">国际化品牌官网搭建</h3>
+                  <p className="text-sm text-gray-400 mb-6 flex-1 leading-relaxed">
+                    别让简陋的网页成为询盘流失的黑洞。我们为您打造符合 2025 国际审美的独立站，让您的工厂 24 小时在全球展示“大厂风范”。
+                  </p>
+                  <div className="text-xs text-[#00CCFF] font-mono tracking-wider"># SEO 优化 # 询盘转化</div>
+               </div>
+            </div>
+
+            {/* Card 2: UI Design */}
+            <div className="group bg-[#1A1A1A] border border-[#333] hover:border-[#FF9900] transition-colors rounded-sm overflow-hidden flex flex-col">
+               <div className="h-48 overflow-hidden relative">
+                 <img 
+                   src="/images/service_ui_hmi.jpg" 
+                   alt="Industrial UI/HMI Design" 
+                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                   onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/600x400/222/555?text=Service:+Industrial+UI+Design'}}
+                 />
+                 <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm p-2 rounded-sm border border-gray-700">
+                    <Layout className="w-5 h-5 text-[#FF9900]" />
+                 </div>
+               </div>
+               <div className="p-8 flex-1 flex flex-col">
+                  <h3 className="text-xl font-bold text-white mb-3">工业 UI/HMI 升级</h3>
+                  <p className="text-sm text-gray-400 mb-6 flex-1 leading-relaxed">
+                    硬件再强，界面太土也会被砍价。我们提供人机交互界面 (HMI) 的视觉重构，让操作体验像使用 iPhone 一样流畅、高级。
+                  </p>
+                  <div className="text-xs text-[#00CCFF] font-mono tracking-wider"># 交互体验 # 智能制造</div>
+               </div>
+            </div>
+
+            {/* Card 3: Patent/Tech */}
+            <div className="group bg-[#1A1A1A] border border-[#333] hover:border-[#FF9900] transition-colors rounded-sm overflow-hidden flex flex-col">
+               <div className="h-48 overflow-hidden relative">
+                 <img 
+                   src="/images/service_patent_blueprint.jpg" 
+                   alt="Patent Visualization" 
+                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                   onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/600x400/111/444?text=Service:+Patent+Blueprint'}}
+                 />
+                 <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-sm p-2 rounded-sm border border-gray-700">
+                    <FileText className="w-5 h-5 text-[#FF9900]" />
+                 </div>
+               </div>
+               <div className="p-8 flex-1 flex flex-col">
+                  <h3 className="text-xl font-bold text-white mb-3">技术可视化 & 专利赋能</h3>
+                  <p className="text-sm text-gray-400 mb-6 flex-1 leading-relaxed">
+                    将枯燥的 CAD 图纸转化为极具商业说服力的“技术原理图”。协助进行实用新型专利开发与视觉包装，构建技术护城河。
+                  </p>
+                  <div className="text-xs text-[#00CCFF] font-mono tracking-wider"># 知识产权 # 技术壁垒</div>
+               </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Aesthetic DNA Section (New Art Portfolio) */}
+      <section className="py-24 bg-[#111] border-t border-[#333]">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+            <div className="border-l-4 border-[#00CCFF] pl-6">
+              <h2 className="text-3xl md:text-4xl font-black text-white mb-2 uppercase">Aesthetic DNA <span className="text-[#00CCFF]">///</span> 视觉基因</h2>
+              <p className="text-gray-400 max-w-xl">
+                为什么选择我们？<br/>
+                因为在重构工业品之前，我们已经掌握了高端室内与艺术设计的光影法则。<br/>
+                <span className="text-[#FF9900] text-sm mt-2 block">以下为工作室 Lovart (即梦) 原创艺术作品展示</span>
+              </p>
+            </div>
+            <button className="text-white border-b border-[#FF9900] pb-1 text-sm hover:text-[#FF9900] transition-colors">
+              查看更多艺术创作 &rarr;
+            </button>
+          </div>
+
+          {/* Masonry-style Grid for Aesthetic Works */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Art Piece 1 - Tall */}
+            <div className="relative group overflow-hidden rounded-sm md:col-span-2 md:row-span-2 aspect-square md:aspect-auto">
+              <img 
+                src="/images/art_dna_01_structure.jpg" 
+                alt="Aesthetic DNA Structure" 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/800x800/222/333?text=Missing:/images/art_dna_01_structure.jpg'}}
+              />
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <span className="text-white font-bold tracking-widest uppercase border border-white px-4 py-2">光影结构研究</span>
+              </div>
+            </div>
+
+            {/* Art Piece 2 */}
+            <div className="relative group overflow-hidden rounded-sm aspect-square">
+               <img 
+                src="/images/art_dna_02_texture.jpg" 
+                alt="Aesthetic DNA Texture" 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/400x400/111/555?text=Missing:/images/art_dna_02_texture.jpg'}}
+              />
+               <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                 <span className="text-gray-300 text-xs">材质渲染实验</span>
+               </div>
+            </div>
+
+            {/* Art Piece 3 */}
+            <div className="relative group overflow-hidden rounded-sm aspect-square">
+               <img 
+                src="/images/art_dna_03_space.jpg" 
+                alt="Aesthetic DNA Space" 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/400x400/222/666?text=Missing:/images/art_dna_03_space.jpg'}}
+              />
+               <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                 <span className="text-gray-300 text-xs">空间氛围营造</span>
+               </div>
+            </div>
+
+             {/* Art Piece 4 - Wide */}
+            <div className="relative group overflow-hidden rounded-sm md:col-span-2 aspect-video md:aspect-auto">
+               <img 
+                src="/images/art_dna_04_future.jpg" 
+                alt="Aesthetic DNA Future" 
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/800x400/000/444?text=Missing:/images/art_dna_04_future.jpg'}}
+              />
+               <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                 <span className="text-gray-300 text-xs">未来主义概念</span>
+               </div>
+            </div>
+          </div>
+          
+          <div className="mt-6 text-center">
+             <p className="text-gray-500 text-xs italic">
+               * 这种顶级的审美能力，就是我们敢于承诺“重构工业价值”的底气。
+             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-24 bg-[#1A1A1A] border-t border-[#333]">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">PRICING <span className="text-[#FF9900]">///</span> 视觉升维方案</h2>
+            <p className="text-gray-400">明码标价，为您节省每一次询价的时间。</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4 md:px-0">
+            
+            {/* Plan A */}
+            <div className="bg-[#111] p-8 border border-[#333] hover:border-gray-500 transition-colors relative group">
+              <h3 className="text-lg font-bold text-gray-300 mb-2 uppercase tracking-wider">A 套餐 · 体验版</h3>
+              <p className="text-sm text-gray-500 mb-6 h-10">极速提升点击率，单品爆破首选。</p>
+              <div className="text-4xl font-black text-white mb-6">¥299 <span className="text-sm font-normal text-gray-500">/ 款</span></div>
+              <div className="w-full h-px bg-[#333] mb-6"></div>
+              <ul className="space-y-4 mb-8 text-gray-300 text-sm">
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>3张 影棚级精修主图</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>工业黑武士 / 德系极简风</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>24小时极速交付</span></li>
+              </ul>
+              <button className="w-full py-3 bg-[#333] text-white font-bold uppercase text-sm tracking-wider hover:bg-white hover:text-black transition-all">
+                立即尝鲜
+              </button>
+            </div>
+
+            {/* Plan B (Main) */}
+            <div className="bg-[#111] p-8 border-2 border-[#FF9900] relative transform md:-translate-y-4 shadow-[0_0_30px_rgba(255,153,0,0.1)]">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FF9900] text-black text-xs font-black px-4 py-1 uppercase tracking-widest shadow-lg">Most Popular</div>
+              <h3 className="text-lg font-bold text-white mb-2 uppercase tracking-wider">B 套餐 · 标准版</h3>
+              <p className="text-sm text-[#FF9900] mb-6 h-10">镇店爆款全案，大幅提升转化率。</p>
+              <div className="text-5xl font-black text-white mb-6">¥1,580 <span className="text-sm font-normal text-gray-500">/ 款</span></div>
+              <div className="w-full h-px bg-[#333] mb-6"></div>
+              <ul className="space-y-4 mb-8 text-gray-300 text-sm">
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span className="text-white font-bold">全套详情页视觉精修</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>SEO 视觉卖点提炼</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>5张 核心卖点可视化 (透视/材质)</span></li>
+                <li className="flex items-start gap-3"><Video className="w-4 h-4 text-[#00CCFF] mt-0.5"/> <span className="text-[#00CCFF]">赠送：15秒静默工业展示视频</span></li>
+              </ul>
+              <button className="w-full py-4 bg-[#FF9900] text-black font-black uppercase text-sm tracking-wider hover:bg-[#e68a00] transition-all shadow-lg">
+                打造爆款
+              </button>
+            </div>
+
+            {/* Plan C */}
+            <div className="bg-[#111] p-8 border border-[#333] hover:border-gray-500 transition-colors relative group">
+              <h3 className="text-lg font-bold text-gray-300 mb-2 uppercase tracking-wider">C 套餐 · 旗舰版</h3>
+              <p className="text-sm text-gray-500 mb-6 h-10">品牌连锁升级，建立大厂信任感。</p>
+              <div className="text-4xl font-black text-white mb-6">¥3,280 <span className="text-sm font-normal text-gray-500">/ 全店</span></div>
+              <div className="w-full h-px bg-[#333] mb-6"></div>
+              <ul className="space-y-4 mb-8 text-gray-300 text-sm">
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>全店视觉规范统一 (VI)</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>1款 “镇店之宝” 深度全案</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>4款 “主力产品” 视觉升级</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="w-4 h-4 text-[#FF9900] mt-0.5"/> <span>终身视觉顾问服务</span></li>
+              </ul>
+              <button className="w-full py-3 bg-[#333] text-white font-bold uppercase text-sm tracking-wider hover:bg-white hover:text-black transition-all">
+                咨询定制
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section className="py-24 relative overflow-hidden border-t border-[#333]">
+        <div className="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
+           <div className="relative">
+              <img 
+                src="/images/about_studio_vibe.jpg" 
+                alt="Visual Alchemy Studio Environment" 
+                className="w-full rounded-sm grayscale hover:grayscale-0 transition-all duration-700"
+                onError={(e) => {e.target.onerror = null; e.target.src='https://placehold.co/600x800/222/444?text=Missing:/images/about_studio_vibe.jpg'}}
+              />
+              <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-[#FF9900]/10 rounded-full blur-3xl -z-10"></div>
+           </div>
+           <div>
+             <div className="text-[#00CCFF] font-mono text-sm mb-6 tracking-widest">ABOUT US /// HANGZHOU</div>
+             <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
+               拒绝平庸的模板。<br/>
+               我们为机器寻找灵魂。
+             </h2>
+             <div className="space-y-6 text-gray-400 font-light leading-relaxed text-lg">
+               <p>
+                 <strong className="text-white">Visual Alchemy</strong> 诞生于中国电商中心——杭州。
+               </p>
+               <p>
+                 我们的核心团队拥有<strong className="text-white">高端室内设计</strong>与<strong className="text-white">商业视觉渲染</strong>背景。我们曾在艺术与豪宅设计领域深耕多年，对光影、质感与空间构成有着近乎偏执的追求。
+               </p>
+               <p>
+                 当我们把目光投向工业领域时，我们发现中国有太多世界级的工厂，却因为简陋的视觉呈现，被误认为是“低端代工”。
+               </p>
+               <p>
+                 因此，我们将艺术领域的审美标准，降维应用到工业品展示中。我们不只是修图，我们用电影级的视觉语言，为您重建品牌溢价。
+               </p>
+             </div>
+             <div className="mt-10 pt-10 border-t border-[#333] flex items-center gap-4">
+                <div className="text-right">
+                  <div className="text-white font-bold text-lg">Visual Alchemy Team</div>
+                  <div className="text-[#FF9900] text-xs uppercase tracking-wider">Design & AI Specialists</div>
+                </div>
+             </div>
+           </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-black py-12 border-t border-[#333]">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+          <div>
+            <h4 className="text-2xl font-black text-white mb-2 uppercase tracking-tight">Visual <span className="text-[#FF9900]">Alchemy</span></h4>
+            <p className="text-gray-500 text-sm">中国 · 杭州 · 工业资产视觉增值专家</p>
+          </div>
+          <div className="flex gap-4">
+             <button className="bg-[#FF9900] text-black px-6 py-3 rounded-sm font-bold hover:bg-[#e68a00] transition-colors flex items-center gap-2 shadow-lg">
+                <Zap className="w-4 h-4" /> 联系指挥官
+             </button>
+          </div>
+        </div>
+        <div className="text-center text-gray-700 text-xs mt-12 font-mono uppercase">
+          © 2025 Visual Alchemy Studio. All Rights Reserved.
+        </div>
+      </footer>
+
+    </div>
+  );
+}
